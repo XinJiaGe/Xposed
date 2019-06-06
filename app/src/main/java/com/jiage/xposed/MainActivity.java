@@ -4,10 +4,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.ConnectivityManager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -15,12 +13,8 @@ import android.widget.TextView;
 import com.jiage.xposed.http.InterfaceServer;
 import com.jiage.xposed.http.SDRequestCallBack;
 import com.jiage.xposed.model.Book;
-import com.jiage.xposed.model.ChapterListModel;
 import com.jiage.xposed.model.RequestBase;
 import com.jiage.xposed.model.RequestModel;
-
-import java.io.Serializable;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     public static final String ACTION_NAME = "com.jiage.xposed.MainActivity";
@@ -39,8 +33,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Book book = new Book();
-                book.setChapter_list("http://zr-cpt-cdn.zrjhwenhua.com/book_4%2F14354%2Flist.txt?OSSAccessKeyId=LTAIGyykPxSXIFXf&Expires=1559728800&Signature=IoZ0hoQNUU8AxK391gPGKyrEk2Y%3D");
-                addChapter(1,book);
+                book.setChapter_list("http://zr-cpt-cdn.zrjhwenhua.com/book_4%2F14354%2Flist.txt?OSSAccessKeyId=LTAIGyykPxSXIFXf&Expires=1559828211&Signature=FSglBRzf5sL5z4KAO0TU6dIXq0s%3D");
             }
         });
         registerBoradcastReceiver();
@@ -66,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
                 if (intent != null) {
                     Bundle bundle = intent.getExtras();
                     if (bundle != null) {
-                        Book model = (Book) bundle.getSerializable("model");
+                        Book model = (Book) bundle.getSerializable("book");
                         if(model!=null&&id!=model.getBook_id()){
                             id = model.getBook_id();
                             set("《"+model.getBook_name()+"》");
@@ -100,67 +93,16 @@ public class MainActivity extends AppCompatActivity {
         }, new SDRequestCallBack<RequestBase>() {
             @Override
             public void onSuccess(RequestBase entity) {
-                set("发送数据成功："+model.getBook_name());
-                addChapter(entity.getData(),model);
+                set("小说添加成功："+model.getBook_name());
             }
 
             @Override
             public void onFailure(int code, String msg) {
                 if(code == 100){
-                    set("数据已存在："+model.getBook_name());
+                    set("小说已存在："+model.getBook_name());
                 }else{
-                    set("发送数据失败："+msg);
+                    set("小说添加失败："+msg);
                 }
-            }
-        });
-    }
-
-    private void addChapter(Object id, final Book model){
-        if(id!=null)
-        InterfaceServer.getInstance().InterfaceGet(model.getChapter_list(),new InterfaceServer.RequestSetGetParamsBack() {
-            @Override
-            public RequestModel setParams(RequestModel requestModel) {
-                return requestModel;
-            }
-        }, new SDRequestCallBack<List<ChapterListModel>>() {
-            @Override
-            public void onSuccess(List<ChapterListModel> entity) {
-                set("获取章节成功");
-//                InterfaceServer.getInstance().InterfaceGet(model.getChapter_list(),new InterfaceServer.RequestSetGetParamsBack() {
-//                    @Override
-//                    public RequestModel setParams(RequestModel requestModel) {
-//                        requestModel.setApi("AddNovel");
-//                        requestModel.put("type", "id");
-//                        requestModel.put("name", model.getBook_name());
-//                        requestModel.put("simple", model.getBook_brief());
-//                        requestModel.put("content", "");
-//                        requestModel.put("label", "");
-//                        requestModel.put("isfolder", "1");
-//                        requestModel.put("thumbnail", model.getBook_cover());
-//                        requestModel.put("j", "0");
-//                        return requestModel;
-//                    }
-//                }, new SDRequestCallBack<RequestBase>() {
-//                    @Override
-//                    public void onSuccess(RequestBase entity) {
-//                        set("发送数据成功："+model.getBook_name());
-//                    }
-//
-//                    @Override
-//                    public void onFailure(int code, String msg) {
-//                        if(code == 100){
-//                            set("数据已存在："+model.getBook_name());
-//                        }else{
-//                            set("发送数据失败："+msg);
-//                        }
-//                    }
-//                });
-            }
-
-            @Override
-            public void onFailure(int code, String msg) {
-                    set("获取章节失败："+msg);
-
             }
         });
     }
